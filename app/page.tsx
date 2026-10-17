@@ -1,69 +1,107 @@
-import Image from "next/image";
+import Link from "next/link";
+import { CATEGORIES, CHAPTERS, getCategoryChapters } from "@/lib/chapters";
+import { Icon } from "./components/Icon";
 
 export default function Home() {
+  const totalMinutes = CHAPTERS.reduce((sum, c) => sum + c.minutes, 0);
+  const hours = Math.round(totalMinutes / 60);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <section className="hero">
+        <span className="eyebrow">
+          <Icon name="shield" size={15} /> Offensive &amp; Defensive · Plain English
+        </span>
+        <h1>
+          Learn cyber security, <span className="hl">the hands-on way.</span>
+        </h1>
+        <p className="hero-lede">
+          A self-paced course that teaches how real attacks happen and exactly how to stop them.
+          Every chapter follows the same shape: what it is, a real-world example, how the attack
+          works, the real tools, and how to prevent it. No fluff, no pure theory.
+        </p>
+        <div className="hero-cta">
+          <Link href="/guide/start-here" className="btn btn-primary">
+            Start learning <Icon name="arrowRight" size={18} />
+          </Link>
+          <Link href="/guide/cryptography" className="btn btn-ghost">
+            <Icon name="lock" size={17} /> Jump to Cryptography
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="stat-row">
+          <div>
+            <div className="stat-num">{CHAPTERS.length}</div>
+            <div className="stat-label">Chapters</div>
+          </div>
+          <div>
+            <div className="stat-num">{CATEGORIES.length}</div>
+            <div className="stat-label">Learning tracks</div>
+          </div>
+          <div>
+            <div className="stat-num">~{hours}h</div>
+            <div className="stat-label">Total reading</div>
+          </div>
+          <div>
+            <div className="stat-num">60+</div>
+            <div className="stat-label">Real tools covered</div>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <div className="notice">
+        <Icon name="shield" size={18} />
+        <span>
+          <strong>Ethics first.</strong> Everything here is for systems you own or have written
+          permission to test. Unauthorized access is illegal. This guide points to legal practice
+          labs throughout.
+        </span>
+      </div>
+
+      {CATEGORIES.map((cat) => {
+        const items = getCategoryChapters(cat.id);
+        if (items.length === 0) return null;
+        return (
+          <section key={cat.id} className="track">
+            <div className="track-head">
+              <span className="track-icon">
+                <Icon name={cat.icon} size={22} />
+              </span>
+              <div>
+                <h2 className="track-title">{cat.name}</h2>
+                <p className="track-tagline">{cat.tagline}</p>
+              </div>
+            </div>
+
+            <div className="card-grid">
+              {items.map((c) => (
+                <Link key={c.slug} href={`/guide/${c.slug}`} className="card">
+                  <div className="card-top">
+                    <span className="card-icon">
+                      <Icon name={c.icon} size={20} />
+                    </span>
+                    <span className="card-num">CH {c.num}</span>
+                  </div>
+                  <span className="card-title">{c.title}</span>
+                  <span className="card-blurb">{c.blurb}</span>
+                  <div className="card-meta">
+                    <span className={`chip diff diff-${c.difficulty}`}>
+                      <span className="diff-dot" /> {c.difficulty}
+                    </span>
+                    <span className="chip chip-time">
+                      <Icon name="clock" size={12} /> {c.minutes} min
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        );
+      })}
+
+      <footer className="landing-foot">
+        <p>CyberGuide · A complete, self-paced security course. Learn offense. Build defense. Act ethically.</p>
+      </footer>
+    </>
   );
 }
